@@ -6,6 +6,7 @@ namespace The_Sound
     {
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             Game game = new Game();
             game.Run();
         }
@@ -19,25 +20,27 @@ namespace The_Sound
             MessageBus = new MessageBus();
             CollisionSystem = new CollisionSystem();
             RenderSystem = new RenderSystem();
-
             State.Player = new Player();
+            GameRules = new GameRulesSystem();
+
             State.Player.Position = new Position
                 (
                     State.Map.PlayerStartPosition.X,
                     State.Map.PlayerStartPosition.Y
                 );
+
             State.Enemies.Add(new Stalker { Position = new Position(5, 5) });
 
             State.IsRunning = true;
         }
 
         public GameState State { get; set; }
-        public string Message { get; set; }
-        public MessageBus MessageBus { get; set; }
         public MovementSystem MovementSystem { get; set; }
+        public MessageBus MessageBus { get; set; }
+        public string Message { get; set; }
         public CollisionSystem CollisionSystem { get; set; }
         public RenderSystem RenderSystem { get; set; }
-
+        public GameRulesSystem GameRules { get; set; }
 
         public void Run()
         {
@@ -49,6 +52,7 @@ namespace The_Sound
                 Thread.Sleep(250);
             }
         }
+
         public void HandleInput()
         {
             if (!Console.KeyAvailable)
@@ -57,6 +61,7 @@ namespace The_Sound
             }
 
             var key = Console.ReadKey(true).Key;
+
             switch (key)
             {
                 case ConsoleKey.W:
@@ -87,18 +92,11 @@ namespace The_Sound
             }
 
             MovementSystem.Update(State);
-
             CollisionSystem.HandleCollisions(State, MessageBus, lastPlayerPosition, lastEnemiesPositions);
-
-            if (State.Player.NextPosition == State.Map.Exit)
-            {
-                Console.Clear();
-                MessageBus.Add("YOU WIN!!!");
-                State.IsRunning = false;
-
-            }
+            GameRules.Check(State, MessageBus);
 
             State.Player.Position = State.Player.NextPosition;
+
             foreach (var enemy in State.Enemies)
             {
                 enemy.Position = enemy.NextPosition;
@@ -106,14 +104,15 @@ namespace The_Sound
         }
     }
 
-    class Player : Entity
+    class Player : MovingEntity
     {
         public Player()
         {
-            Sprite = new Sprite('P', ConsoleColor.Blue);
+            Sprite = Sprites.Player;
         }
+
         public int Lives { get; set; } = 3;
-        public Direction Direction { get; set; }
+
         public void TakeDamage(int damage)
         {
             Lives -= damage;
@@ -124,7 +123,7 @@ namespace The_Sound
     {
         public Stalker()
         {
-            Sprite = new Sprite('Z', ConsoleColor.Red);
+            Sprite = Sprites.Stalker;
             Damage = 1;
             Speed = 1;
         }
@@ -160,7 +159,8 @@ namespace The_Sound
             int height = layout.Length;
             int width = layout[0].Length;
 
-            Field = new char[height, width];
+            Field = new Tile[height, width];
+
 
 
             for (int y = 0; y < height; y++)
@@ -172,37 +172,37 @@ namespace The_Sound
                     if (symbol == 'P')
                     {
                         PlayerStartPosition = new Position(x, y);
-                        Field[y, x] = ' ';
+                        Field[y, x] = Tiles.Floor;
                     }
 
                     else if (symbol == 'E')
                     {
                         Exit = new Position(x, y);
-                        Field[y, x] = 'E';
+                        Field[y, x] = Tiles.Exit;
+                    }
+
+                    else if (symbol =='#')
+                    {
+                        Field[y, x] = Tiles.Wall;
                     }
 
                     else
                     {
-                        Field[y, x] = symbol;
+                        Field[y, x] = Tiles.Floor;
                     }
                 }
             }
         }
 
-        public char[,] Field { get; set; }
+        public Tile[,] Field { get; set; }
         public Position PlayerStartPosition { get; set; }
         public Position Exit { get; set; }
         public int Height => Field.GetLength(0);
         public int Width => Field.GetLength(1);
 
-        public char GetCell(Position pos)
+        public Tile GetTile(Position pos)
         {
             return Field[pos.Y, pos.X];
-        }
-
-        public void SetCell(Position pos, char value)
-        {
-            Field[pos.Y, pos.X] = value;
         }
 
         public bool IsInside(Position pos)
@@ -255,20 +255,24 @@ namespace The_Sound
         }
     }
 
-    class MessageBus
+   
+    abstract class Entity
     {
-        private List<string> messages = new List<string>();
+        public Position Position { get; set; }
+        public Position NextPosition { get; set; }
+        public Sprite Sprite { get; set; }
+    }
 
-        public void Add(string message)
-        {
-            messages.Add(message);
-        }
-        public List<string> GetAll()
-        {
-            return new List<String>(messages);
-        }
-        public void Clear()
-        { messages.Clear(); }
+    abstract class MovingEntity: Entity
+    {
+        public Direction Direction { get; set; }
+    }
+
+    abstract class Enemy : MovingEntity
+    {
+        public int Speed { get; set; }
+        public int Damage { get; set; }
+        abstract public Direction UpdateDirection(GameState state);
     }
 
     class GameState
@@ -277,10 +281,29 @@ namespace The_Sound
         {
             Map = new Map();
         }
+
         public Player Player { get; set; }
         public List<Enemy> Enemies { get; set; } = new List<Enemy>();
         public Map Map { get; set; }
         public bool IsRunning { get; set; }
+    }
+
+    class MessageBus
+    {
+        private List<string> messages = new List<string>();
+
+        public void Add(string message)
+        {
+            messages.Add(message);
+        }
+
+        public List<string> GetAll()
+        {
+            return new List<String>(messages);
+        }
+
+        public void Clear()
+        { messages.Clear(); }
     }
 
     class MovementSystem
@@ -290,6 +313,7 @@ namespace The_Sound
             MovePlayer(state);
             MoveEnemies(state);
         }
+
         public void MovePlayer(GameState state)
         {
             state.Player.NextPosition = CalculateNewPosition(
@@ -297,6 +321,7 @@ namespace The_Sound
                     state.Player.Direction,
                     state.Map);
         }
+
         public void MoveEnemies(GameState state)
         {
             foreach (var enemy in state.Enemies)
@@ -329,7 +354,7 @@ namespace The_Sound
                     break;
             }
 
-            if (map.IsInside(newPos) && map.GetCell(newPos) != '#')
+            if (map.IsInside(newPos) && map.GetTile(newPos).IsWalkable)
             {
                 return newPos;
             }
@@ -337,20 +362,7 @@ namespace The_Sound
             return current;
         }
     }
-    abstract class Enemy : Entity
-    {
-        public Direction Direction { get; set; }
-        public int Speed { get; set; }
-        public int Damage { get; set; }
-        abstract public Direction UpdateDirection(GameState state);
-    }
 
-    abstract class Entity
-    {
-        public Position Position { get; set; }
-        public Position NextPosition { get; set; }
-        public Sprite Sprite { get; set; }
-    }
 
     class CollisionSystem
     {
@@ -371,12 +383,6 @@ namespace The_Sound
                 {
                     state.Player.TakeDamage(enemy.Damage);
                     messageBus.Add("Zombie hits you");
-
-                    if (state.Player.Lives <= 0)
-                    {
-                        state.IsRunning = false;
-                        messageBus.Add("YOU DIED");
-                    }
                 }
             }
         }
@@ -387,12 +393,13 @@ namespace The_Sound
         public void DrawSprite(Sprite sprite)
         {
             Console.ForegroundColor = sprite.Color;
-            Console.Write(sprite.Symbol);
+            Console.Write(sprite.Lines[0]);
             Console.ResetColor();
         }
+
         public void Render(GameState state, MessageBus messageBus)
         {
-            Console.Clear();
+            Console.SetCursorPosition(0, 0);
 
             for (int y = 0; y < state.Map.Height; y++)
             {
@@ -417,18 +424,46 @@ namespace The_Sound
                         }
                         if (!isEnemyHere)
                         {
-                            Console.Write(state.Map.GetCell(new Position(x, y)));
+                            DrawSprite(state.Map.GetTile(new Position(x, y)).Sprite);
                         }
                     }
                 }
+
                 Console.WriteLine();
             }
+
             Console.WriteLine($"Lives: {state.Player.Lives}");
+
             foreach (var msg in messageBus.GetAll())
             {
                 Console.WriteLine(msg);
             }
+
             messageBus.Clear();
         }
+    }
+
+    class GameRulesSystem
+    {
+        public void Check(GameState state, MessageBus messageBus)
+        {
+            if (state.Player.NextPosition == state.Map.Exit)
+            {
+                Console.SetCursorPosition(0,0);
+                messageBus.Add("YOU WIN!!!");
+                state.IsRunning = false;
+
+            }
+
+            if (state.Player.Lives <= 0)
+            {
+                Console.SetCursorPosition(0, 0);
+                messageBus.Add("YOU DIED");
+                state.IsRunning = false;
+            }
+
+        }
+
+
     }
 }
