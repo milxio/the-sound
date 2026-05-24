@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace The_Sound
+namespace The_Sound.Graphics
 {
     static class Sprites
     {

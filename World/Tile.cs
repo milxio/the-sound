@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using The_Sound.Graphics;
 
-namespace The_Sound
+namespace The_Sound.World
 {
     public class Tile
     {

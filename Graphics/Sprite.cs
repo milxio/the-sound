@@ -5,12 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace The_Sound
+namespace The_Sound.Graphics
 {
     public class Sprite
     {
         public string[] Lines { get; }
         public ConsoleColor Color { get; }
+
+        public int Height => Lines.Length;
+        public int Width => Lines[0].Length;
 
         public Sprite(string[] lines, ConsoleColor color)
         {
