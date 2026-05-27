@@ -52,26 +52,26 @@ namespace The_Sound.Systems
             }
         }
          
-       public void RenderPlayer(Player player)
+       public void RenderEntity(Entity entity)
        {
             
-            DrawSprite(player.Sprite, player.Position);
+            DrawSprite(entity.Sprite, entity.Position);
        }
 
-        public void RenderEnemies(List<Enemy> enemies)
+        public void RenderEntities(List<Enemy> enemies)
        {
-            foreach (Enemy enemy in enemies)
+            foreach (var enemy in enemies)
            {
-                DrawSprite(enemy.Sprite, enemy.Position);
+                RenderEntity (enemy);
            }
        }
 
        public void Render(GameState state, MessageBus messageBus)
        {
             Console.SetCursorPosition(0, 0);
-            
-            RenderPlayer(state.Player);
-            RenderEnemies(state.Enemies);
+
+            RenderEntity(state.Player);
+            RenderEntities(state.Enemies);
 
             Console.SetCursorPosition(0, state.Map.Height * TileHeight + 1);
             Console.Write($"Lives: {state.Player.Lives}  ");
