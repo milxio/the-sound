@@ -42,6 +42,7 @@ namespace The_Sound.Core
 
         public void Run()
         {
+            RenderSystem.RenderMap(State.Map);
             while (State.IsRunning)
             {
                 HandleInput();
@@ -93,7 +94,13 @@ namespace The_Sound.Core
             CollisionSystem.HandleCollisions(State, MessageBus, lastPlayerPosition, lastEnemiesPositions);
             GameRules.Check(State, MessageBus);
 
+            RenderSystem.EraseEntity(lastPlayerPosition, State.Map);
             State.Player.Position = State.Player.NextPosition;
+
+            foreach (var position in lastEnemiesPositions)
+            {
+                RenderSystem.EraseEntity(position, State.Map);
+            }
 
             foreach (var enemy in State.Enemies)
             {
