@@ -7,8 +7,9 @@ using The_Sound.Common;
 
 namespace The_Sound.Entities
 {
-    abstract class MovingEntity : Entity
+   public abstract class MovingEntity : Entity
     {
         public Direction Direction { get; set; }
+        public int Speed { get; set; } = 1;
     }
 }

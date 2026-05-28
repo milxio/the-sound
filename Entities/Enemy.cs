@@ -8,10 +8,9 @@ using The_Sound.Core;
 
 namespace The_Sound.Entities
 {
-    abstract class Enemy : MovingEntity
+    public abstract class Enemy : MovingEntity
     {
-        public int Speed { get; set; }
         public int Damage { get; set; }
-        abstract public Direction UpdateDirection(GameState state);
+        abstract public Direction UpdateDirection (GameState state);
     }
 }

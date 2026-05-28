@@ -7,7 +7,7 @@ using The_Sound.Graphics;
 
 namespace The_Sound.Entities
 {
-    class Player : MovingEntity
+    public class Player : MovingEntity
     {
         public Player()
         {

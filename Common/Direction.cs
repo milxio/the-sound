@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace The_Sound.Common
 {
-    enum Direction
+    public enum Direction
     {
         Up,
         Down,

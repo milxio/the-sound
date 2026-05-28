@@ -7,7 +7,7 @@ using The_Sound.Common;
 
 namespace The_Sound.World
 {
-    class Map
+   public class Map
     {
         public Map()
         {
@@ -15,7 +15,7 @@ namespace The_Sound.World
             {
                 "#############################",
                 "#P     #          #         #",
-                "#      #                    #",
+                "#      #             S      #",
                 "#   ###  ###  #  ###  ###   #",
                 "#   ###  #   ###   #  ###   #",
                 "#        ###  #  ###        #",
@@ -25,7 +25,7 @@ namespace The_Sound.World
                 "#   ###  ###  #  ###  ###   #",
                 "#                           #",
                 "#   ###  #  ###   #  ###    #",
-                "#     ###           ###     E",
+                "#     ###    S      ###     E",
                 "#############################"
                 };
 
@@ -34,34 +34,39 @@ namespace The_Sound.World
 
             Field = new Tile[height, width];
 
-
-
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     char symbol = layout[y][x];
 
-                    if (symbol == 'P')
+                    switch (symbol)
                     {
-                        PlayerStartPosition = new Position(x, y);
-                        Field[y, x] = Tiles.Floor;
-                    }
+                        case 'P':
+                            PlayerStartPosition = new Position(x, y);
+                            Field[y, x] = Tiles.Floor;
+                            break;
 
-                    else if (symbol == 'E')
-                    {
-                        Exit = new Position(x, y);
-                        Field[y, x] = Tiles.Exit;
-                    }
+                        case 'S':
+                            EnemySpawnPositions.Add(new EnemySpawnData
+                            {
+                                Position = new Position(x, y),
+                                Symbol = 'S'
+                            });
+                            Field[y, x] = Tiles.Floor;
+                            break;
 
-                    else if (symbol == '#')
-                    {
-                        Field[y, x] = Tiles.Wall;
-                    }
+                        case 'E':
+                            Exit = new Position(x, y);
+                            Field[y, x] = Tiles.Exit;
+                            break;
 
-                    else
-                    {
-                        Field[y, x] = Tiles.Floor;
+                        case '#':
+                            Field[y, x] = Tiles.Wall;
+                            break;
+                        default:
+                            Field[y, x] = Tiles.Floor;
+                            break;
                     }
                 }
             }
@@ -69,6 +74,7 @@ namespace The_Sound.World
 
         public Tile[,] Field { get; set; }
         public Position PlayerStartPosition { get; set; }
+        public List<EnemySpawnData> EnemySpawnPositions { get; set; } = new();
         public Position Exit { get; set; }
         public int Height => Field.GetLength(0);
         public int Width => Field.GetLength(1);

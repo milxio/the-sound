@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using The_Sound.Common;
-using The_Sound.Graphics;
 
-namespace The_Sound.Entities
+namespace The_Sound.World
 {
-   public abstract class Entity
+    public class EnemySpawnData
     {
         public Position Position { get; set; }
-        public Position NextPosition { get; set; }
-        public Sprite Sprite { get; set; }
+        public char Symbol { get; set; }
+
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using The_Sound.Common;
 using The_Sound.Entities;
 using The_Sound.Systems;
+using The_Sound.World;
 
 namespace The_Sound.Core
 {
@@ -14,12 +15,14 @@ namespace The_Sound.Core
         public Game()
         {
             State = new GameState();
+            EnemyFactory = new EnemyFactory();
+            GameRules = new GameRulesSystem();
             MovementSystem = new MovementSystem();
-            MessageBus = new MessageBus();
             CollisionSystem = new CollisionSystem();
             RenderSystem = new RenderSystem();
+            MessageBus = new MessageBus();
+
             State.Player = new Player();
-            GameRules = new GameRulesSystem();
 
             State.Player.Position = new Position
                 (
@@ -27,18 +30,23 @@ namespace The_Sound.Core
                     State.Map.PlayerStartPosition.Y
                 );
 
-            State.Enemies.Add(new Stalker { Position = new Position(5, 5) });
+            foreach (var spawn in State.Map.EnemySpawnPositions)
+            {
+                Enemy enemy = EnemyFactory.CreateEnemy(spawn);
+                State.Enemies.Add(enemy);
+            }
 
             State.IsRunning = true;
         }
 
         public GameState State { get; set; }
+        public EnemyFactory EnemyFactory { get; set; }
+        public GameRulesSystem GameRules { get; set; }
         public MovementSystem MovementSystem { get; set; }
-        public MessageBus MessageBus { get; set; }
-        public string Message { get; set; }
         public CollisionSystem CollisionSystem { get; set; }
         public RenderSystem RenderSystem { get; set; }
-        public GameRulesSystem GameRules { get; set; }
+        public MessageBus MessageBus { get; set; }
+        public string Message { get; set; }
 
         public void Run()
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace The_Sound.Common
 {
-    struct Position
+    public struct Position
     {
         public int X;
         public int Y;

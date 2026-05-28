@@ -8,7 +8,7 @@ using The_Sound.World;
 
 namespace The_Sound.Core
 {
-    class GameState
+    public class GameState
     {
         public GameState()
         {
