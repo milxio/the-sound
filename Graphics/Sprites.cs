@@ -8,7 +8,7 @@ namespace The_Sound.Graphics
 {
     static class Sprites
     {
-        public static Sprite Player = new Sprite (new[] { "[]", "\\/" }, ConsoleColor.Cyan);
+        public static Sprite Player = new Sprite (new[] { "^^", "oo" }, ConsoleColor.Cyan);
 
         public static Sprite Stalker = new Sprite(new[] { "OO", "\\/" }, ConsoleColor.Red);
 

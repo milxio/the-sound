@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using The_Sound.Common;
 using The_Sound.Entities;
 using The_Sound.Systems;
+using The_Sound.Core.Events;
 
 namespace The_Sound.Core
 {
@@ -90,12 +91,23 @@ namespace The_Sound.Core
         }
         public void Update()
         {
-
+            State.Sounds.Clear();
             MovementSystem.Update(State);
             CollisionSystem.HandleCollisions(State, MessageBus);
             GameRules.Check(State, MessageBus);
 
             ApplyMovementSystem.Apply(State);
+
+
+            if (State.Player.Position != State.Player.PreviousPosition)
+            {
+                State.Sounds.Add(new SoundEvent
+                {
+                    Position = State.Player.Position,
+                    Loudness = 5
+                });
+                MessageBus.Add($"Sounds: {State.Sounds.Count}");
+            }
 
             foreach (var entity in State.GetMovingEntities())
             {
