@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using The_Sound.Common;
 using The_Sound.Entities;
 using The_Sound.Systems;
-using The_Sound.World;
 
 namespace The_Sound.Core
 {
@@ -18,6 +17,7 @@ namespace The_Sound.Core
             EnemyFactory = new EnemyFactory();
             GameRules = new GameRulesSystem();
             MovementSystem = new MovementSystem();
+            ApplyMovementSystem = new ApplyMovementSystem();
             CollisionSystem = new CollisionSystem();
             RenderSystem = new RenderSystem();
             MessageBus = new MessageBus();
@@ -43,10 +43,10 @@ namespace The_Sound.Core
         public EnemyFactory EnemyFactory { get; set; }
         public GameRulesSystem GameRules { get; set; }
         public MovementSystem MovementSystem { get; set; }
+        public ApplyMovementSystem ApplyMovementSystem { get; set; }
         public CollisionSystem CollisionSystem { get; set; }
         public RenderSystem RenderSystem { get; set; }
         public MessageBus MessageBus { get; set; }
-        public string Message { get; set; }
 
         public void Run()
         {
@@ -103,17 +103,13 @@ namespace The_Sound.Core
             GameRules.Check(State, MessageBus);
 
             RenderSystem.EraseEntity(lastPlayerPosition, State.Map);
-            State.Player.Position = State.Player.NextPosition;
 
             foreach (var position in lastEnemiesPositions)
             {
                 RenderSystem.EraseEntity(position, State.Map);
             }
 
-            foreach (var enemy in State.Enemies)
-            {
-                enemy.Position = enemy.NextPosition;
-            }
+            ApplyMovementSystem.Apply(State);
         }
     }
 }

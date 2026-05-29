@@ -19,5 +19,15 @@ namespace The_Sound.Core
         public List<Enemy> Enemies { get; set; } = new List<Enemy>();
         public Map Map { get; set; }
         public bool IsRunning { get; set; }
+
+        public IEnumerable<MovingEntity> GetMovingEntities()
+        {
+            yield return Player;
+
+            foreach (var enemy in Enemies)
+            {
+                yield return enemy;
+            }
+        }
     }
 }

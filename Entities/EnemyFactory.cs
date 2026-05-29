@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using The_Sound.Entities;
+using The_Sound.World;
 
-namespace The_Sound.World
+namespace The_Sound.Entities
 {
     public class EnemyFactory
     {

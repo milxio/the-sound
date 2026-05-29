@@ -33,11 +33,10 @@ namespace The_Sound.Systems
             Console.ResetColor();
         }
 
-        public void EraseEntity (Position oldPosition, Map map)
+        public void EraseEntity(Position oldPosition, Map map)
         {
             Tile tile = map.GetTile(oldPosition);
             DrawSprite(tile.Sprite, oldPosition);
-            
         }
 
         public void RenderMap(Map map)
@@ -47,45 +46,38 @@ namespace The_Sound.Systems
                 for (int x = 0; x < map.Width; x++)
                 {
                     Tile tile = map.GetTile(new Position(x, y));
-                    DrawSprite(tile.Sprite, new Position(x,y));
+                    DrawSprite(tile.Sprite, new Position(x, y));
                 }
             }
         }
-         
-       public void RenderEntity(Entity entity)
-       {
-            
-            DrawSprite(entity.Sprite, entity.Position);
-       }
 
-        public void RenderEntities(List<Enemy> enemies)
-       {
-            foreach (var enemy in enemies)
-           {
-                RenderEntity (enemy);
-           }
-       }
+        public void RenderEntities(GameState state)
+        {
+            foreach (var entity in state.GetMovingEntities())
+            {
+                DrawSprite(entity.Sprite, entity.Position);
+            }
+        }
 
-       public void Render(GameState state, MessageBus messageBus)
-       {
+        public void Render(GameState state, MessageBus messageBus)
+        {
             Console.SetCursorPosition(0, 0);
 
-            RenderEntity(state.Player);
-            RenderEntities(state.Enemies);
+            RenderEntities(state);
 
             Console.SetCursorPosition(0, state.Map.Height * TileHeight + 1);
             Console.Write($"Lives: {state.Player.Lives}  ");
 
-            int uiY = state.Map.Height * TileHeight+2;
+            int uiY = state.Map.Height * TileHeight + 2;
 
             foreach (var msg in messageBus.GetAll())
             {
                 Console.SetCursorPosition(0, uiY);
-                Console.Write(msg+"         ");
+                Console.Write(msg + "         ");
                 uiY++;
             }
 
             messageBus.Clear();
-       }
+        }
     }
 }
