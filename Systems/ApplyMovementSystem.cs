@@ -15,6 +15,7 @@ namespace The_Sound.Systems
             
             foreach (var entity in state.GetMovingEntities())
             {
+                entity.PreviousPosition = entity.Position;
                 entity.Position = entity.NextPosition;
             }
         }

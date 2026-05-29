@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using The_Sound.Common;
 using The_Sound.Core;
+using The_Sound.Entities;
 using The_Sound.World;
 
 namespace The_Sound.Systems
@@ -17,12 +18,16 @@ namespace The_Sound.Systems
             MoveEnemies(state);
         }
 
+        public void MoveEntity(MovingEntity entity, Map map)
+        {
+            entity.NextPosition = CalculateNewPosition(
+                entity.Position,
+                entity.Direction,
+                map);
+        }
         public void MovePlayer(GameState state)
         {
-            state.Player.NextPosition = CalculateNewPosition(
-                    state.Player.Position,
-                    state.Player.Direction,
-                    state.Map);
+            MoveEntity(state.Player, state.Map);
         }
 
         public void MoveEnemies(GameState state)
@@ -30,7 +35,7 @@ namespace The_Sound.Systems
             foreach (var enemy in state.Enemies)
             {
                 enemy.Direction = enemy.UpdateDirection(state);
-                enemy.NextPosition = CalculateNewPosition(enemy.Position, enemy.Direction, state.Map);
+                MoveEntity(enemy, state.Map);
             }
         }
 

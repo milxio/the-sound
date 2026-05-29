@@ -9,6 +9,7 @@ namespace The_Sound.Entities
 {
    public abstract class MovingEntity : Entity
     {
+        public Position PreviousPosition { get; set; }
         public Direction Direction { get; set; }
         public int Speed { get; set; } = 1;
     }

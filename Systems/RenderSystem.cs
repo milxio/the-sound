@@ -33,10 +33,10 @@ namespace The_Sound.Systems
             Console.ResetColor();
         }
 
-        public void EraseEntity(Position oldPosition, Map map)
+        public void EraseEntity(MovingEntity entity, Map map)
         {
-            Tile tile = map.GetTile(oldPosition);
-            DrawSprite(tile.Sprite, oldPosition);
+            Tile tile = map.GetTile(entity.PreviousPosition);
+            DrawSprite(tile.Sprite, entity.PreviousPosition);
         }
 
         public void RenderMap(Map map)
@@ -51,9 +51,9 @@ namespace The_Sound.Systems
             }
         }
 
-        public void RenderEntities(GameState state)
+        public void RenderEntities(IEnumerable<MovingEntity> entities)
         {
-            foreach (var entity in state.GetMovingEntities())
+            foreach (var entity in entities)
             {
                 DrawSprite(entity.Sprite, entity.Position);
             }
@@ -63,7 +63,7 @@ namespace The_Sound.Systems
         {
             Console.SetCursorPosition(0, 0);
 
-            RenderEntities(state);
+            RenderEntities(state.GetMovingEntities());
 
             Console.SetCursorPosition(0, state.Map.Height * TileHeight + 1);
             Console.Write($"Lives: {state.Player.Lives}  ");

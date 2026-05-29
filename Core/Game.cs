@@ -90,26 +90,18 @@ namespace The_Sound.Core
         }
         public void Update()
         {
-            var lastPlayerPosition = State.Player.Position;
-            var lastEnemiesPositions = new List<Position>();
-
-            foreach (var enemy in State.Enemies)
-            {
-                lastEnemiesPositions.Add(enemy.Position);
-            }
 
             MovementSystem.Update(State);
-            CollisionSystem.HandleCollisions(State, MessageBus, lastPlayerPosition, lastEnemiesPositions);
+            CollisionSystem.HandleCollisions(State, MessageBus);
             GameRules.Check(State, MessageBus);
 
-            RenderSystem.EraseEntity(lastPlayerPosition, State.Map);
+            ApplyMovementSystem.Apply(State);
 
-            foreach (var position in lastEnemiesPositions)
+            foreach (var entity in State.GetMovingEntities())
             {
-                RenderSystem.EraseEntity(position, State.Map);
+                RenderSystem.EraseEntity(entity, State.Map);
             }
 
-            ApplyMovementSystem.Apply(State);
         }
     }
 }
